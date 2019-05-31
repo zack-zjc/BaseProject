@@ -1,0 +1,40 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+android {
+  compileSdkVersion rootProject.ext.android.compileSdkVersion
+
+  defaultConfig {
+    minSdkVersion rootProject.ext.android.minSdkVersion
+    targetSdkVersion rootProject.ext.android.targetSdkVersion
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+  }
+
+  kapt {
+    generateStubs = true
+  }
+}
+
+dependencies {
+  implementation fileTree(dir: 'libs', include: ['*.jar'])
+  implementation rootProject.ext.dependencies["kotlin-stdlib-jdk7"]
+  api rootProject.ext.dependencies["appcompat-v7"]
+  //rxPermission
+  implementation rootProject.ext.dependencies["rxpermissions"]
+  //fragment框架start
+  api rootProject.ext.dependencies["fragmentation"]
+  api rootProject.ext.dependencies["fragmentation-swipeback"]
+  //fragment框架end
+  api rootProject.ext.dependencies["CBDialog"]
+}
+repositories {
+  mavenCentral()
+}

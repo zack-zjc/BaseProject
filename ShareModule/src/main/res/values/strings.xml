@@ -1,0 +1,16 @@
+<resources>
+  <string name="app_name">ShareModule</string>
+  <string name="str_share_fail">分享失败!</string>
+  <string name="str_share_success">分享成功!</string>
+  <string name="str_share_cancel">取消分享</string>
+  <string name="str_share_message_error">分享内容错误</string>
+  <string name="str_share_message_to">分享到</string>
+  <string name="str_share_app_miss_error">请先安装应用平台</string>
+
+  <string name="str_share_qq">QQ好友</string>
+  <string name="str_share_qzone">QQ空间</string>
+  <string name="str_share_wechat">微信</string>
+  <string name="str_share_wechat_scence">朋友圈</string>
+  <string name="str_share_sina">微博</string>
+  <string name="str_share_alipay">支付宝</string>
+</resources>

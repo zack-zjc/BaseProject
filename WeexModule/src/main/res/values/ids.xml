@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <item name="id_weex_back_icon" type="id"/>
+  <item name="id_weex_title" type="id" />
+  <item name="id_weex_menu_icon" type="id"/>
+  <item name="id_weex_menu_custom_icon" type="id"/>
+  <item name="id_weex_menu_text" type="id"/>
+  <item name="id_weex_title_container" type="id"/>
+
+  <item name="id_weex_page_container" type="id"/>
+
+</resources>

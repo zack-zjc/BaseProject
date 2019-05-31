@@ -1,0 +1,48 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+Properties properties = new Properties()
+properties.load(file('build.properties').newDataInputStream())
+//微博分享开启
+def weiboEnable = properties.getProperty("weiboEnable").toBoolean()
+//微信分享开启
+def wechatEnable = properties.getProperty("wechatEnable").toBoolean()
+//qq分享开启
+def qqEnable = properties.getProperty("qqEnable").toBoolean()
+
+android {
+
+  compileSdkVersion rootProject.ext.android.compileSdkVersion
+
+  defaultConfig {
+    minSdkVersion rootProject.ext.android.minSdkVersion
+    targetSdkVersion rootProject.ext.android.targetSdkVersion
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+  }
+
+  kapt {
+    generateStubs = true
+  }
+
+}
+
+dependencies {
+  implementation fileTree(dir: 'libs', include: ['*.jar'])
+  implementation rootProject.ext.dependencies["kotlin-stdlib-jdk7"]
+  implementation rootProject.ext.dependencies["recyclerview-v7"]
+  implementation rootProject.ext.dependencies["CBDialog"]
+  implementation rootProject.ext.dependencies["wechat-sdk"]
+  implementation rootProject.ext.dependencies["weibo-sdk"]
+  implementation files('libs/open_sdk_r6008_lite.jar')//qq分享sdk
+}
+repositories {
+  mavenCentral()
+}

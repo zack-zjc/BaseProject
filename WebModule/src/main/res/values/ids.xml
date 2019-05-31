@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <item name="id_web_web_view" type="id"/>
+  <item name="id_web_web_title_view" type="id"/>
+  <item name="id_web_title_view" type="id"/>
+  <item name="id_web_back_view" type="id"/>
+  <item name="id_web_close_view" type="id"/>
+  <item name="id_web_menu_icon" type="id"/>
+  <item name="id_web_progressbar" type="id"/>
+
+  <item name="id_base_pop_item_text" type="id"/>
+  <item name="id_base_pop_item_image" type="id"/>
+  <item name="id_base_pop_list" type="id"/>
+
+
+</resources>

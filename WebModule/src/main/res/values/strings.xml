@@ -1,0 +1,8 @@
+<resources>
+  <string name="app_name">WebModule</string>
+  <string name="str_web_close">关闭</string>
+  <string name="str_web_share">分享</string>
+  <string name="str_web_open_safria">浏览器打开</string>
+  <string name="str_web_copy_safria_url">复制链接</string>
+  <string name="str_web_copy_sucess">复制到剪切板成功</string>
+</resources>

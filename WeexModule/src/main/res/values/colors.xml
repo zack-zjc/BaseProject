@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <color name="color_weex_colorAccent">#3299cc</color>
+
+  <color name="color_weex_title_color">#333333</color>
+
+  <color name="color_weex_title_white_color">#ffffff</color>
+
+  <color name="color_weex_menu_color">#333333</color>
+
+  <color name="color_weex_menu_white_color">#ffffff</color>
+
+  <color name="color_weex_divider_color">#f5f5f5</color>
+</resources>

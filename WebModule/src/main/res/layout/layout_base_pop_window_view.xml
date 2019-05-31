@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="150dp"
+    android:layout_height="wrap_content"
+    android:background="@mipmap/icon_base_pop_window">
+
+  <ListView
+      android:id="@id/id_base_pop_list"
+      android:scrollbars="none"
+      android:divider="@drawable/drawable_base_divider"
+      android:dividerHeight="0.3dp"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"/>
+
+</LinearLayout>

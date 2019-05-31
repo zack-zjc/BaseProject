@@ -1,0 +1,23 @@
+<resources>
+
+  <!-- 设置白色背景statusbar的style-->
+  <style name="NewAppTheme.Web.WhiteStatusBar" parent="Theme.AppCompat.Light.DarkActionBar">
+    <item name="colorPrimary">@android:color/white</item>
+    <item name="colorPrimaryDark">@android:color/white</item>
+    <item name="colorButtonNormal">@android:color/white</item>
+    <item name="colorAccent">@color/color_web_colorAccent</item>
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
+    <item name="android:windowBackground">@android:color/white</item>
+    <item name="android:windowIsTranslucent">true</item>
+  </style>
+
+  <!--popWindow的背景style-->
+  <style name="style_base_pop_window">
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
+    <item name="android:windowEnterAnimation">@anim/anim_base_popup_enter</item>
+    <item name="android:windowExitAnimation">@anim/anim_base_popup_exit</item>
+  </style>
+
+</resources>

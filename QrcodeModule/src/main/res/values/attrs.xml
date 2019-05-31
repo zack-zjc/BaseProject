@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <declare-styleable name="ViewfinderView">
+    <attr name="dividerColor" format="color" />
+    <attr name="maskColor" format="color" />
+    <attr name="angleColor" format="color" />
+  </declare-styleable>
+
+</resources>

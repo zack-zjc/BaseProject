@@ -1,0 +1,15 @@
+<resources>
+
+  <!-- 设置白色背景statusbar的style-->
+  <style name="NewAppTheme.Weex.WhiteStatusBar" parent="Theme.AppCompat.Light.DarkActionBar">
+    <item name="colorPrimary">@android:color/white</item>
+    <item name="colorPrimaryDark">@android:color/white</item>
+    <item name="colorButtonNormal">@android:color/white</item>
+    <item name="colorAccent">@color/color_weex_colorAccent</item>
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
+    <item name="android:windowBackground">@android:color/white</item>
+    <item name="android:windowIsTranslucent">true</item>
+  </style>
+
+</resources>
