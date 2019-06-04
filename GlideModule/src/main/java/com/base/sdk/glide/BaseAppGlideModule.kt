@@ -39,7 +39,7 @@ open class BaseAppGlideModule : AppGlideModule() {
     val memoryCache = LruResourceCache(customMemoryCacheSize.toLong())
     builder.setMemoryCache(memoryCache)
     builder.setBitmapPool(LruBitmapPool(customBitmapPoolSize.toLong()))
-    val diskCache: DiskCache.Factory = if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+    val diskCache: DiskCache.Factory = if (checkSelfPermission(context,Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
       ExternalPreferredCacheDiskCacheFactory(context)
     } else {
       InternalCacheDiskCacheFactory(context)
@@ -52,12 +52,12 @@ open class BaseAppGlideModule : AppGlideModule() {
   /**
    * 是否有相关权限
    */
-  private fun checkSelfPermission(permission: String): Boolean {
+  private fun checkSelfPermission(context: Context,permission: String): Boolean {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      ApplicationContext.CONTEXT.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
+      context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
     }else{
-      val packageManager = ApplicationContext.CONTEXT.packageManager
-      packageManager.checkPermission(permission, ApplicationContext.CONTEXT.packageName) == PackageManager.PERMISSION_GRANTED
+      val packageManager = context.packageManager
+      packageManager.checkPermission(permission, context.packageName) == PackageManager.PERMISSION_GRANTED
     }
   }
 

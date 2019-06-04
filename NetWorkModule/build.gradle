@@ -31,6 +31,3 @@ dependencies {
   api rootProject.ext.dependencies["okhttp"]
   api rootProject.ext.dependencies["fastjson"]
 }
-repositories {
-  mavenCentral()
-}

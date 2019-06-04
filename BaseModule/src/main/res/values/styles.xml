@@ -1,0 +1,10 @@
+<resources>
+
+  <style name="style_base_pop_window">
+    <item name="windowActionBar">false</item>
+    <item name="windowNoTitle">true</item>
+    <item name="android:windowEnterAnimation">@anim/anim_base_popup_enter</item>
+    <item name="android:windowExitAnimation">@anim/anim_base_popup_exit</item>
+  </style>
+
+</resources>

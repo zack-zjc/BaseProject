@@ -1,6 +1,6 @@
 package com.base.sdk.http
 
-import android.content.Context
+import android.app.Application
 
 /**
  * author:zack
@@ -9,10 +9,6 @@ import android.content.Context
  */
 object ApplicationContext {
 
-  val CONTEXT : Context by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
-    val mActivityThread = Class.forName("android.app.ActivityThread")
-    val applicationMethod = mActivityThread.getDeclaredMethod("currentApplication")
-    applicationMethod.invoke(null) as Context
-  }
+  lateinit var CONTEXT : Application
 
 }

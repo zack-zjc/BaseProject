@@ -1,5 +1,6 @@
 package com.base.sdk.base.util
 
+import android.content.Context
 import android.os.Build
 import android.view.Window
 import android.view.WindowManager
@@ -112,10 +113,10 @@ object DeviceUtil {
     /**
      * 获取statusBar高度
      */
-    fun getStatusBarHeight() :Int {
-        val resourceId = ApplicationContext.CONTEXT.resources.getIdentifier("status_bar_height", "dimen", "android")
+    fun getStatusBarHeight(context:Context) :Int {
+        val resourceId = context.resources.getIdentifier("status_bar_height", "dimen", "android")
         if (resourceId > 0) {
-            return ApplicationContext.CONTEXT.resources.getDimensionPixelSize(resourceId)
+            return context.resources.getDimensionPixelSize(resourceId)
         }
         return 0
     }
@@ -124,20 +125,20 @@ object DeviceUtil {
      * 是否是刘海屏
      * true 是 false otherwise
      */
-    fun isNotchScreen() :Boolean {
+    fun isNotchScreen(context:Context) :Boolean {
         try {
             if (isHuaWei()){
-                val HwNotchSizeUtil = ApplicationContext.CONTEXT.classLoader.loadClass("com.huawei.android.util.HwNotchSizeUtil")
+                val HwNotchSizeUtil = context.classLoader.loadClass("com.huawei.android.util.HwNotchSizeUtil")
                 val get = HwNotchSizeUtil.getMethod("hasNotchInScreen")
                 return get.invoke(HwNotchSizeUtil) as Boolean
             } else if (isOPPO()){
-                return ApplicationContext.CONTEXT.packageManager.hasSystemFeature("com.oppo.feature.screen.heteromorphism")
+                return context.packageManager.hasSystemFeature("com.oppo.feature.screen.heteromorphism")
             } else if (isVIVO()){
-                val FtFeature = ApplicationContext.CONTEXT.classLoader.loadClass("android.util.FtFeature")
+                val FtFeature = context.classLoader.loadClass("android.util.FtFeature")
                 val get = FtFeature.getMethod("isFeatureSupport", Int::class.javaPrimitiveType)
                 return get.invoke(FtFeature, 0x00000020) as Boolean
             } else if (isXiaoMi()){
-                val pro = ApplicationContext.CONTEXT.classLoader.loadClass("android.os.SystemProperties")
+                val pro = context.classLoader.loadClass("android.os.SystemProperties")
                 val get = pro.getMethod("getInt", String::class.java, Int::class.javaPrimitiveType)
                 return (get.invoke(pro, "ro.miui.notch", 0) as Int) == 1
             }

@@ -32,6 +32,3 @@ dependencies {
   implementation project(':NetWorkModule')
   implementation project(':GlideModule')
 }
-repositories {
-  mavenCentral()
-}

@@ -1,5 +1,6 @@
 package com.base.sdk.http
 
+import android.app.Application
 import com.base.sdk.http.config.HttpConfig
 import com.base.sdk.http.config.HttpSetting
 
@@ -17,7 +18,8 @@ object HttpClientLib {
    * userAgent：请求userAgent
    * useCookie:是否使用cookie
    */
-  fun init(setting:HttpSetting){
+  fun init(application: Application,setting:HttpSetting){
+    ApplicationContext.CONTEXT = application
     HttpConfig.init(setting)
   }
 

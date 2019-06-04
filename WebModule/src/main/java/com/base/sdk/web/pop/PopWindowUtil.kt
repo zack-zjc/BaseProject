@@ -1,6 +1,7 @@
 package com.base.sdk.web.pop
 
 import android.app.Activity
+import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -8,7 +9,6 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ListView
 import android.widget.PopupWindow
-import com.base.sdk.base.util.ApplicationContext
 import com.base.sdk.web.R
 
 /**
@@ -44,19 +44,19 @@ object PopWindowUtil {
     popupWindow.isFocusable = true
     popupWindow.isTouchable = true
     popupWindow.setBackgroundDrawable(ColorDrawable())
-    popupWindow.width = dpToPixel(150)
+    popupWindow.width = dpToPixel(rootView.context,150)
     popupWindow.height = contentView.measuredHeight
     popupWindow.contentView = contentView
     if (!popupWindow.isShowing) {
-      popupWindow.showAsDropDown(rootView,rootView.measuredWidth-dpToPixel(150),10)
+      popupWindow.showAsDropDown(rootView,rootView.measuredWidth-dpToPixel(rootView.context,150),10)
     }
   }
 
   /**
    * 转化dp为pixel
    */
-  private fun dpToPixel(dp: Int): Int {
-    val displayMetrics = ApplicationContext.CONTEXT.resources.displayMetrics
+  private fun dpToPixel(context:Context,dp: Int): Int {
+    val displayMetrics = context.applicationContext.resources.displayMetrics
     return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp.toFloat(), displayMetrics).toInt()
   }
 

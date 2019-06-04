@@ -28,6 +28,3 @@ dependencies {
   implementation rootProject.ext.dependencies["kotlin-stdlib-jdk7"]
   implementation rootProject.ext.dependencies["appcompat-v7"]
 }
-repositories {
-  mavenCentral()
-}

@@ -1,5 +1,7 @@
 package com.base.sdk.share
 
+import android.app.Application
+import com.base.sdk.share.config.ApplicationContext
 import com.base.sdk.share.config.ShareConfig
 import com.base.sdk.share.platform.PlatformSetting
 
@@ -9,6 +11,13 @@ import com.base.sdk.share.platform.PlatformSetting
  * Description:分享设置
  */
 object ShareLib {
+
+  /**
+   * 初始化application
+   */
+  fun init(application: Application){
+    ApplicationContext.CONTEXT = application
+  }
 
   /**
    * 初始化对应的存在的分享平台

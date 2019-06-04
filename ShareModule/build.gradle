@@ -41,8 +41,5 @@ dependencies {
   implementation rootProject.ext.dependencies["CBDialog"]
   implementation rootProject.ext.dependencies["wechat-sdk"]
   implementation rootProject.ext.dependencies["weibo-sdk"]
-  implementation files('libs/open_sdk_r6008_lite.jar')//qq分享sdk
-}
-repositories {
-  mavenCentral()
+  implementation files('libs/open_sdk_r6008_lite.jar') //qq分享sdk
 }

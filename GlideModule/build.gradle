@@ -32,6 +32,3 @@ dependencies {
   //glide依赖end
   implementation rootProject.ext.dependencies["okhttp"]
 }
-repositories {
-  mavenCentral()
-}
