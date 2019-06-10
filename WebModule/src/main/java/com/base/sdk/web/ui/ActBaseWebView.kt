@@ -52,7 +52,7 @@ abstract class ActBaseWebView : BasePermissionActivity(),OnClickListener{
   protected var shareEntity: ShareEntity? = null
 
   //扫码的callback返回
-  protected var scanCllback:String? =null
+  protected var scanCallback:String? =null
 
   //webview对象
   protected var mWebView:WebView? = null
@@ -102,7 +102,7 @@ abstract class ActBaseWebView : BasePermissionActivity(),OnClickListener{
     if (resultCode == Activity.RESULT_OK){
       if (requestCode == REQUEST_SCAN){ //处理扫码返回
         val qrCode = data?.getStringExtra("qrCode")
-        scanCllback?.let {
+        scanCallback?.let {
           if (!qrCode.isNullOrEmpty()){
             val resultObject = JSONObject()
             resultObject["scanCode"] = qrCode
@@ -315,7 +315,7 @@ abstract class ActBaseWebView : BasePermissionActivity(),OnClickListener{
    * 开启扫码
    */
   open fun startScan(callbackName: String){
-    this.scanCllback = callbackName
+    this.scanCallback = callbackName
     val intent = Intent(this,ActQrcodeScanner::class.java)
     startActivityForResult(intent,REQUEST_SCAN)
   }

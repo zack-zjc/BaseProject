@@ -6,7 +6,6 @@
     <activity
         android:configChanges="orientation|keyboardHidden|screenSize|smallestScreenSize|screenLayout"
         android:name="com.base.sdk.web.ui.ActWebView"
-        android:screenOrientation="portrait"
         android:theme="@style/NewAppTheme.Web.WhiteStatusBar"
         android:windowSoftInputMode="stateHidden|adjustNothing">
     </activity>

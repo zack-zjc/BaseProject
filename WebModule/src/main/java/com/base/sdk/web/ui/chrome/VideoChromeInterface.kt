@@ -9,6 +9,7 @@ import android.view.WindowManager
 import android.webkit.WebChromeClient.CustomViewCallback
 import android.webkit.WebView
 import android.widget.FrameLayout
+import com.base.sdk.web.R
 
 /**
  * author:zack
@@ -37,10 +38,12 @@ open class VideoChromeInterface(private val activity: Activity,private val webVi
     }
     webView?.visibility = View.GONE
     if (mMovieParentView == null) {
-      val mDecorView = activity.window.decorView as FrameLayout
-      mMovieParentView = FrameLayout(activity)
-      mMovieParentView?.setBackgroundColor(Color.BLACK)
-      mDecorView.addView(mMovieParentView)
+      val containerView = activity.findViewById<ViewGroup?>(R.id.id_web_root_view)
+      if (containerView != null){
+        mMovieParentView = FrameLayout(activity)
+        mMovieParentView?.setBackgroundColor(Color.BLACK)
+        containerView.addView(mMovieParentView,ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT))
+      }
     }
     this.mCallback = callback
     this.mMovieView = view
