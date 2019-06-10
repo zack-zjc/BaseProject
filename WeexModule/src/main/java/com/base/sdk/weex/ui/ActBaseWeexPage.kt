@@ -12,6 +12,7 @@ import android.provider.MediaStore
 import android.support.v4.content.FileProvider
 import com.alibaba.fastjson.JSONObject
 import com.base.sdk.base.activity.BasePermissionActivity
+import com.base.sdk.qrcode.ui.ActQrcodeScanner
 import com.taobao.weex.bridge.JSCallback
 import java.io.File
 import java.util.UUID
@@ -23,6 +24,7 @@ import java.util.UUID
  */
 open class ActBaseWeexPage : BasePermissionActivity(){
 
+  private val REQUEST_SCAN = 55 //scan
   private val REQUEST_CAPTURE_IMAGE = 88 //拍照
   private val REQUEST_PICK_IMAGE = 89 //相册
   private val REQUEST_PICK_VIDEO = 91 //视频
@@ -39,6 +41,8 @@ open class ActBaseWeexPage : BasePermissionActivity(){
 
   //选择媒体返回类
   private lateinit var callback:JSCallback
+  //scan callback
+  private lateinit var scanCallback:JSCallback
 
   /**
    * 挑选图片
@@ -204,6 +208,13 @@ open class ActBaseWeexPage : BasePermissionActivity(){
         data?.let {
           callbackData(getVideoUriAbsolutePath(it.data))
         }
+      } else if (requestCode == REQUEST_SCAN){ //视频
+        val qrCode = data?.getStringExtra("qrCode")
+        if (!qrCode.isNullOrEmpty()){
+          val resultObject = JSONObject()
+          resultObject["scanCode"] = qrCode
+          scanCallback.invoke(resultObject)
+        }
       }
     }
   }
@@ -221,5 +232,13 @@ open class ActBaseWeexPage : BasePermissionActivity(){
     callback.invokeAndKeepAlive(json)
   }
 
+  /**
+   * 开启扫码
+   */
+  open fun startScan(callback: JSCallback){
+    this.scanCallback = callback
+    val intent = Intent(this, ActQrcodeScanner::class.java)
+    startActivityForResult(intent,REQUEST_SCAN)
+  }
 
 }

@@ -36,4 +36,17 @@ open class WXLCEventModule : WXModule(){
     }
   }
 
+  /**
+   * start scan qrcode
+   */
+  @JSMethod(uiThread = true)
+  open fun ScanQrCode(callback: JSCallback?){
+    val context = mWXSDKInstance.context
+    if (context is ActBaseWeexPage) {
+      callback?.let {
+        context.startScan(it)
+      }
+    }
+  }
+
 }

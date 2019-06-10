@@ -32,13 +32,12 @@ open class JScriptInterface(activity: Activity) {
     val jsonObject = JSONObject.parseObject(options)
     val callbackName = if (jsonObject.containsKey("callback")) jsonObject["callback"] else ""
     jsonObject.remove("callback")
-    val resultString: String
     try{
       val result = HttpClientUtil.fetch(JSONObject.parseObject(options))
-      resultString = result["data"].toString()
+      val resultObject = JSONObject.parseObject(result["data"].toString())
       mHandler.post {
         if (activityReference.get() != null && activityReference.get() is ActBaseWebView && !(activityReference.get() as ActBaseWebView).isFinishing){
-          (activityReference.get() as ActBaseWebView).getWebView()?.loadUrl("javascript:$callbackName('$resultString');")
+          (activityReference.get() as ActBaseWebView).getWebView()?.loadUrl("javascript:$callbackName($resultObject);")
         }
       }
     }catch (e:Exception){
@@ -93,8 +92,8 @@ open class JScriptInterface(activity: Activity) {
         val json = JSONObject.parseObject(optionStr)
         val type = json["type"].toString()
         val callbackName = if (json.containsKey("callback")) json["callback"].toString() else ""
-        val ratioX = if (json.containsKey("x")) json["x"].toString().toInt() else 1
-        val ratioY = if (json.containsKey("y")) json["y"].toString().toInt() else 1
+        val ratioX = if (json.containsKey("x")) json["x"].toString().toInt() else 0
+        val ratioY = if (json.containsKey("y")) json["y"].toString().toInt() else 0
         if (it is ActWebView){
           when(type){
             "0" -> it.takePhoto(ratioX,ratioY,callbackName)

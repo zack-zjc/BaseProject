@@ -11,4 +11,10 @@
   <item type="id" name="quit"/>
   <item type="id" name="restart_preview"/>
 
+
+  <item type="id" name="id_qrcode_view_container"/>
+  <item type="id" name="id_qrcode_page_container"/>
+  <item type="id" name="id_qrcode_back_view"/>
+  <item type="id" name="id_qrcode_title_view"/>
+
 </resources>

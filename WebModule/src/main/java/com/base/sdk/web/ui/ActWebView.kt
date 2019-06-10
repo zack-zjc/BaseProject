@@ -228,7 +228,7 @@ open class ActWebView : ActBaseWebView() {
     json["name"] = file.name
     json["path"] = file.absolutePath
     json["sign"] = UUID.randomUUID().toString()
-    getWebView()?.loadUrl("javascript:$callbackName('${json.toJSONString()}');")
+    getWebView()?.loadUrl("javascript:$callbackName($json);")
   }
 
   /**

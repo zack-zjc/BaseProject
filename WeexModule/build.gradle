@@ -29,6 +29,10 @@ dependencies {
   implementation rootProject.ext.dependencies["appcompat-v7"]
   implementation rootProject.ext.dependencies["weex_sdk"]
   implementation project(':BaseModule')
+  implementation project(':QrcodeModule')
   implementation project(':NetWorkModule')
   implementation project(':GlideModule')
+}
+repositories {
+  mavenCentral()
 }

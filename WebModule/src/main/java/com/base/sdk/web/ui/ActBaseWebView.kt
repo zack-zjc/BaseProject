@@ -17,8 +17,9 @@ import android.webkit.WebViewClient
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
+import com.alibaba.fastjson.JSONObject
 import com.base.sdk.base.activity.BasePermissionActivity
+import com.base.sdk.qrcode.ui.ActQrcodeScanner
 import com.base.sdk.share.ShareUtil
 import com.base.sdk.web.R
 import com.base.sdk.web.R.layout
@@ -103,7 +104,9 @@ abstract class ActBaseWebView : BasePermissionActivity(),OnClickListener{
         val qrCode = data?.getStringExtra("qrCode")
         scanCllback?.let {
           if (!qrCode.isNullOrEmpty()){
-            getWebView()?.loadUrl("javascript:$it('$qrCode');")
+            val resultObject = JSONObject()
+            resultObject["scanCode"] = qrCode
+            getWebView()?.loadUrl("javascript:$it($resultObject);")
           }
         }
       }
@@ -311,9 +314,10 @@ abstract class ActBaseWebView : BasePermissionActivity(),OnClickListener{
   /**
    * 开启扫码
    */
-  fun startScan(callbackName: String){
+  open fun startScan(callbackName: String){
     this.scanCllback = callbackName
-    Toast.makeText(this,"未实现startScan",Toast.LENGTH_SHORT).show()
+    val intent = Intent(this,ActQrcodeScanner::class.java)
+    startActivityForResult(intent,REQUEST_SCAN)
   }
 
   /**

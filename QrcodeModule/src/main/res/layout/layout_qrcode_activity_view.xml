@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+  <FrameLayout
+      android:id="@id/id_qrcode_view_container"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"/>
+
+  <RelativeLayout
+      android:id="@id/id_qrcode_page_container"
+      android:background="#33000000"
+      android:fitsSystemWindows="true"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@id/id_qrcode_back_view"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:paddingLeft="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:scaleType="centerInside"
+        android:src="@mipmap/icon_qrcode_navigation_back"/>
+
+    <TextView
+        android:id="@id/id_qrcode_title_view"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_vertical"
+        android:textSize="20dp"
+        android:lines="1"
+        android:ellipsize="end"
+        android:maxWidth="200dp"
+        android:textColor="@android:color/white"
+        android:text="扫一扫"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"/>
+
+  </RelativeLayout>
+
+</FrameLayout>

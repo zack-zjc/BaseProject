@@ -27,4 +27,8 @@ dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
   implementation rootProject.ext.dependencies["kotlin-stdlib-jdk7"]
   implementation rootProject.ext.dependencies["appcompat-v7"]
+  implementation project(':BaseModule')
+}
+repositories {
+  mavenCentral()
 }
