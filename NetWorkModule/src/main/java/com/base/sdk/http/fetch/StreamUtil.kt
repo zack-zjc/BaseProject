@@ -160,9 +160,9 @@ object StreamUtil {
   }
 
   private fun isNetworkOn():Boolean{
-    val connectManager = ApplicationContext.CONTEXT.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    val mNetworkInfo = connectManager.activeNetworkInfo
-    return mNetworkInfo.isConnected
+    val connectManager = ApplicationContext.CONTEXT.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+    val mNetworkInfo = connectManager?.activeNetworkInfo
+    return mNetworkInfo?.isConnected?:false
   }
 
 }
