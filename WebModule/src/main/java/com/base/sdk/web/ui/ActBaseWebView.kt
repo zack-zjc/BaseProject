@@ -29,7 +29,6 @@ import com.base.sdk.web.constant.WebConstants
 import com.base.sdk.web.entity.ShareEntity
 import com.base.sdk.web.jsinterface.JScriptInterface
 import com.base.sdk.web.ui.chrome.BaseWebChromeClient
-import com.base.sdk.web.ui.chrome.VideoChromeInterface
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
@@ -86,6 +85,11 @@ abstract class ActBaseWebView : BasePermissionActivity(),OnClickListener{
     getWebView()?.onPause()
   }
 
+  override fun onDestroy() {
+    super.onDestroy()
+    getWebView()?.destroy()
+  }
+
   /**
    * 回退
    */
@@ -114,20 +118,7 @@ abstract class ActBaseWebView : BasePermissionActivity(),OnClickListener{
   }
 
   //chromeClient
-  private val mWebChromeClient = object : BaseWebChromeClient(VideoChromeInterface(this,getWebView())) {
-
-    override fun onProgressChanged(view: WebView?,newProgress: Int) {
-      super.onProgressChanged(view, newProgress)
-      initProgress(newProgress)
-    }
-
-    override fun onReceivedTitle(view: WebView?,title: String?) {
-      super.onReceivedTitle(view, title)
-      title?.let {
-        initTitle(it)
-      }
-    }
-  }
+  private val mWebChromeClient = BaseWebChromeClient(this,getWebView())
 
   private val mWebViewClient = object:WebViewClient(){
 
@@ -170,7 +161,7 @@ abstract class ActBaseWebView : BasePermissionActivity(),OnClickListener{
       it.savePassword = false
       //适配5.0不允许http和https混合使用情况
       it.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-      getWebView()?.setLayerType(View.LAYER_TYPE_HARDWARE, null)
+//      getWebView()?.setLayerType(View.LAYER_TYPE_HARDWARE, null)
       it.textZoom = 100
       it.databaseEnabled = true
       it.loadsImagesAutomatically = true

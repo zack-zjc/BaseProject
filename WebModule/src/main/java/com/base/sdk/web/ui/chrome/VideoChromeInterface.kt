@@ -1,14 +1,11 @@
 package com.base.sdk.web.ui.chrome
 
 import android.app.Activity
-import android.content.pm.ActivityInfo
-import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.webkit.WebChromeClient.CustomViewCallback
 import android.webkit.WebView
-import android.widget.FrameLayout
 import com.base.sdk.web.R
 
 /**
@@ -19,7 +16,7 @@ import com.base.sdk.web.R
 open class VideoChromeInterface(private val activity: Activity,private val webView:WebView?) : IVideo{
 
   private var mMovieView :View? = null
-  private var mMovieParentView :ViewGroup? = null
+  private var mPreWebContainer :View? = null
   private var mCallback:CustomViewCallback? = null
 
   /**
@@ -27,28 +24,20 @@ open class VideoChromeInterface(private val activity: Activity,private val webVi
    */
   override fun onShowCustomView(view: View,callback: CustomViewCallback) {
     if (activity.isFinishing) return
-    if (activity.requestedOrientation != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
-      activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-    }
-    // 保存当前屏幕的常亮
-    activity.window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     if (mMovieView != null) { //当前已经是全屏了
       callback.onCustomViewHidden()
       return
     }
-    webView?.visibility = View.GONE
-    if (mMovieParentView == null) {
-      val containerView = activity.findViewById<ViewGroup?>(R.id.id_web_root_view)
-      if (containerView != null){
-        mMovieParentView = FrameLayout(activity)
-        mMovieParentView?.setBackgroundColor(Color.BLACK)
-        containerView.addView(mMovieParentView,ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT))
-      }
+    val containerView = activity.findViewById<ViewGroup?>(R.id.id_web_root_view)
+    if (containerView != null){
+      mPreWebContainer = containerView.getChildAt(0)
+      containerView.removeViewAt(0)
+      this.mMovieView = view
+      containerView.addView(mMovieView,ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT))
+      this.mCallback = callback
+      // 保存当前屏幕的常亮
+      activity.window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
-    this.mCallback = callback
-    this.mMovieView = view
-    mMovieParentView?.addView(mMovieView)
-    mMovieParentView?.visibility = View.VISIBLE
   }
 
   /**
@@ -56,15 +45,14 @@ open class VideoChromeInterface(private val activity: Activity,private val webVi
    */
   override fun onHideCustomView() {
     if (mMovieView == null) return
-    if (activity.requestedOrientation != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-      activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    val containerView = activity.findViewById<ViewGroup?>(R.id.id_web_root_view)
+    if (containerView != null){
+      mMovieView?.visibility = View.GONE
+      containerView.removeView(mMovieView)
+      containerView.addView(mPreWebContainer,ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT))
+      mCallback?.onCustomViewHidden()
+      mMovieView = null
     }
-    mMovieView?.visibility = View.GONE
-    mMovieParentView?.removeView(mMovieView)
-    mMovieParentView?.visibility = View.GONE
-    mCallback?.onCustomViewHidden()
-    mMovieView = null
-    webView?.visibility = View.VISIBLE
   }
 
   /**

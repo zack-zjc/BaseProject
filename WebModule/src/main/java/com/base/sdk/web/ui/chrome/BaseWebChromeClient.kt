@@ -1,25 +1,35 @@
 package com.base.sdk.web.ui.chrome
 
-import android.view.View
-import android.webkit.WebChromeClient
+import android.webkit.WebView
+import com.base.sdk.web.ui.ActBaseWebView
+import java.lang.ref.WeakReference
 
 /**
  * author:zack
- * Date:2019/4/17
- * Description:基础的client
+ * Date:2019/6/11
+ * Description:webChromeClient
  */
-open class BaseWebChromeClient(private val videoInterface:IVideo?=null) : WebChromeClient() {
+open class BaseWebChromeClient(mActivity: ActBaseWebView,mWebView: WebView?) :BaseWebVideoChromeClient(VideoChromeInterface(mActivity,mWebView)) {
 
-  override fun onShowCustomView(view: View?,callback: CustomViewCallback?) {
-    super.onShowCustomView(view, callback)
-    if (view != null && callback != null){
-      videoInterface?.onShowCustomView(view,callback)
+  private val activityWeakReference = WeakReference(mActivity)
+
+  /**
+   * 获取网页加载进度
+   */
+  override fun onProgressChanged(view: WebView?, newProgress: Int) {
+    super.onProgressChanged(view, newProgress)
+    activityWeakReference.get()?.initProgress(newProgress)
+  }
+
+  /**
+   * 获取网页标题
+   */
+  override fun onReceivedTitle(view: WebView?,title: String?) {
+    super.onReceivedTitle(view, title)
+    title?.let {
+      activityWeakReference.get()?.initTitle(it)
     }
   }
 
-  override fun onHideCustomView() {
-    super.onHideCustomView()
-    videoInterface?.onHideCustomView()
-  }
 
 }
