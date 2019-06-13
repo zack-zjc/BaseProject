@@ -20,7 +20,7 @@ object HttpClientUtil {
    * header:请求头部
    * followRedirect：是否redirect请求
    */
-  fun fetch(options:JSONObject): MutableMap<String, Any?> {
+  fun fetch(options:JSONObject): JSONObject {
     val method = options["method"].toString()
     val path = options["path"].toString()
     var server = HttpConfig.getDefaultHost()
@@ -44,7 +44,7 @@ object HttpClientUtil {
       followRedirect = options["followRedirect"] as Boolean
     }
     val result = StreamUtil.stream(method, path, server, queryParam, body, header, followRedirect)
-    HttpConfig.getErrorHandler().handleError(result["code"].toString().toInt(),result["data"].toString())
+    HttpConfig.getErrorHandler().handleError(result["code"].toString().toInt(),result["data"])
     return result
   }
 
@@ -58,7 +58,7 @@ object HttpClientUtil {
    * followRedirect：是否redirect请求
    * T:返回数据类型，需要序列化
    */
-  fun <T> fetch(options:JSONObject,responseType:Class<T>) : MutableMap<String, Any?>{
+  fun <T> fetch(options:JSONObject,responseType:Class<T>) : JSONObject{
     val result = fetch(options)
     result["data"] = JSON.parseObject(result["data"].toString(),responseType)
     return result

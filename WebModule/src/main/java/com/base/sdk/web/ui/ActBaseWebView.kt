@@ -1,6 +1,8 @@
 package com.base.sdk.web.ui
 
 import android.app.Activity
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
@@ -10,13 +12,13 @@ import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.webkit.DownloadListener
 import android.webkit.WebChromeClient
-import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import com.alibaba.fastjson.JSONObject
 import com.base.sdk.base.activity.BasePermissionActivity
 import com.base.sdk.qrcode.ui.ActQrcodeScanner
@@ -24,11 +26,15 @@ import com.base.sdk.share.ShareUtil
 import com.base.sdk.web.R
 import com.base.sdk.web.R.layout
 import com.base.sdk.web.R.mipmap
+import com.base.sdk.web.R.string
 import com.base.sdk.web.config.WebCustomSetting
 import com.base.sdk.web.constant.WebConstants
 import com.base.sdk.web.entity.ShareEntity
 import com.base.sdk.web.jsinterface.JScriptInterface
+import com.base.sdk.web.pop.MenuBean
+import com.base.sdk.web.pop.PopWindowUtil
 import com.base.sdk.web.ui.chrome.BaseWebChromeClient
+import com.base.sdk.web.ui.client.BaseWebClient
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
@@ -44,9 +50,6 @@ abstract class ActBaseWebView : BasePermissionActivity(),OnClickListener{
   //请求扫描
   val REQUEST_SCAN = 55
 
-  //是否展示分享
-  protected var showShare = true
-
   //分享的数据
   protected var shareEntity: ShareEntity? = null
 
@@ -60,9 +63,7 @@ abstract class ActBaseWebView : BasePermissionActivity(),OnClickListener{
     super.onCreate(savedInstanceState)
     setContentView(getPageLayoutId())
     val pageName = intent.getStringExtra(WebConstants.PAGE_NAME) ?:""
-    val showShare = intent.getBooleanExtra(WebConstants.SHOW_SHARE,true)
-    val showMore = intent.getBooleanExtra(WebConstants.SHOW_MORE,true)
-    initToolbar(pageName,showShare,showMore)
+    initToolbar(pageName)
     configWebView()
     getWebViewContainer().addView(getWebView(),ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
     val url = intent.getStringExtra(WebConstants.INTENT_URL)
@@ -120,24 +121,8 @@ abstract class ActBaseWebView : BasePermissionActivity(),OnClickListener{
   //chromeClient
   private val mWebChromeClient = BaseWebChromeClient(this,getWebView())
 
-  private val mWebViewClient = object:WebViewClient(){
-
-    override fun shouldOverrideUrlLoading(view: WebView?,request: WebResourceRequest?): Boolean {
-      if(request == null) return false
-      val url = request.url.toString()
-      if (url.startsWith("http") || url.startsWith("https")){
-        view?.loadUrl(url)
-      }else{
-        try {
-          val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-          view?.context?.startActivity(intent)
-        }catch (e:Exception){
-          e.printStackTrace()
-        }
-      }
-      return true
-    }
-  }
+  //webClient
+  private val mWebViewClient = BaseWebClient()
 
   private val downloadListenr = DownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
     try {
@@ -241,7 +226,7 @@ abstract class ActBaseWebView : BasePermissionActivity(),OnClickListener{
   /**
    * 初始化toolbar
    */
-  private fun initToolbar(pageName:String,canShare:Boolean,showMore:Boolean){
+  private fun initToolbar(pageName:String){
     val title = findViewById<TextView>(R.id.id_web_title_view)
     title.text = pageName
     val backView = findViewById<ImageView>(R.id.id_web_back_view)
@@ -255,11 +240,6 @@ abstract class ActBaseWebView : BasePermissionActivity(),OnClickListener{
       menuView.setImageResource(mipmap.icon_web_more_white_setting)
       title.setTextColor(Color.WHITE)
       closeView.setTextColor(Color.WHITE)
-    }
-    if (!showMore){
-      findViewById<View>(R.id.id_web_menu_icon).visibility = View.GONE
-    }else{
-      showShare = canShare
     }
   }
 
@@ -296,6 +276,13 @@ abstract class ActBaseWebView : BasePermissionActivity(),OnClickListener{
   }
 
   /**
+   * 清除分享数据
+   */
+  open fun clearShareData(){
+    shareEntity = null
+  }
+
+  /**
    *  默认分享操作
    */
   open fun shareDefault(){
@@ -312,13 +299,42 @@ abstract class ActBaseWebView : BasePermissionActivity(),OnClickListener{
   }
 
   /**
+   * 更多按钮点击事件
+   */
+  open fun moreMenuClick(view: View){
+    val menus = arrayListOf<MenuBean>()
+    if (shareEntity != null){
+      menus.add(
+          MenuBean(iconId = mipmap.icon_web_safria,menuText = resources.getString(string.str_web_open_safria),clickListener = OnClickListener {
+            val viewIntent = Intent(Intent.ACTION_VIEW)
+            viewIntent.data = Uri.parse(intent.getStringExtra(WebConstants.INTENT_URL))
+            startActivity(viewIntent)
+          })
+      )
+      menus.add(
+          MenuBean(iconId = mipmap.icon_web_copy_link,menuText = resources.getString(string.str_web_copy_safria_url),clickListener = OnClickListener {
+            val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+            clipboardManager?.text = intent.getStringExtra(WebConstants.INTENT_URL)
+            Toast.makeText(this, R.string.str_web_copy_sucess, Toast.LENGTH_SHORT).show()
+          })
+      )
+      menus.add(
+          MenuBean(iconId = mipmap.icon_web_share,menuText =resources.getString(string.str_web_share),clickListener = OnClickListener {
+            shareDefault()
+          })
+      )
+    }
+    menus.add(
+        MenuBean(iconId = mipmap.icon_web_refresh,menuText =resources.getString(string.str_web_refresh),clickListener = OnClickListener {
+          getWebView()?.reload()
+        })
+    )
+    PopWindowUtil.showPopWindow(view,menus)
+  }
+
+  /**
    * 获取jsInterface
    */
   abstract fun getJsInterface(): JScriptInterface?
-
-  /**
-   * 更多按钮点击事件
-   */
-  abstract fun moreMenuClick(view: View)
 
 }

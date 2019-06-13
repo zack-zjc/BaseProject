@@ -39,8 +39,8 @@ object StreamUtil {
    * followRedirect：是否redirect请求
    */
   fun stream(method:String,path:String,host:String,queryParam: JSONObject,body:Any?,
-    header: JSONObject,followRedirect:Boolean):MutableMap<String, Any?>{
-    val result = mutableMapOf<String,Any?>()
+    header: JSONObject,followRedirect:Boolean):JSONObject{
+    val result = JSONObject()
     val urlDomain = Uri.parse(host).host?:""
     if (!HttpConfig.isInWhiteList(urlDomain)){
       result["code"] = HttpConstants.HTTP_ERROR_WHITE_LIST_EXCEPTION
@@ -108,7 +108,12 @@ object StreamUtil {
       val okHttpClient = if (followRedirect) OkHttpUtil.REQUEST_REDIRECT_CLIENT.getOkHttpClient() else REQUEST_CLIENT.getOkHttpClient()
       val response = okHttpClient.newCall(request).execute()
       result["code"] = response.code()
-      result["headers"] = response.headers().toMultimap()
+      val headers = response.headers().toMultimap()
+      val headerJson = JSONObject()
+      for ((key,value) in headers){
+        headerJson[key] = value
+      }
+      result["headers"] = headerJson
       val decoder = HttpConfig.getAcceptDecoder(accept)
       var returnData :Any? = null
       decoder?.let {
@@ -124,8 +129,8 @@ object StreamUtil {
   /**
    * 处理网络请求出错
    */
-  private fun parseException(exception: Exception):MutableMap<String, Any?>{
-    val result = mutableMapOf<String,Any?>()
+  private fun parseException(exception: Exception):JSONObject{
+    val result = JSONObject()
     result["data"] = exception.message
     when(exception){
       is SSLPeerUnverifiedException ->{

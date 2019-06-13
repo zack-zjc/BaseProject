@@ -10,17 +10,15 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.support.v4.content.FileProvider
-import android.view.View
-import android.view.View.OnClickListener
 import com.alibaba.fastjson.JSONObject
-import com.base.sdk.web.R
 import com.base.sdk.web.config.WebCustomSetting
 import com.base.sdk.web.constant.WebConstants
 import com.base.sdk.web.jsinterface.JScriptInterface
-import com.base.sdk.web.pop.MenuBean
-import com.base.sdk.web.pop.PopWindowUtil
 import java.io.File
 import java.util.UUID
+import android.content.ContentValues
+
+
 
 open class ActWebView : ActBaseWebView() {
 
@@ -117,49 +115,6 @@ open class ActWebView : ActBaseWebView() {
     startActivityForResult(intent, REQUEST_PICK_VIDEO)
   }
 
-  //根据uri获取视频绝对路径
-  private fun getVideoUriAbsolutePath(uri: Uri?) :String{
-    var filePath = ""
-    val indexTemp = uri.toString().lastIndexOf("/")
-    val id = uri.toString().substring(indexTemp+1)
-    val projection = arrayOf(MediaStore.Video.Media.DATA)
-    val selection = MediaStore.Video.Media._ID + "=?"
-    val selectionArgs = arrayOf(id)
-    val cursor = this.contentResolver.query(
-        MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection,selection
-        ,selectionArgs, null)
-    cursor?.let {
-      val columnIndex = it.getColumnIndex(projection[0])
-      if (it.moveToFirst()) {
-        filePath = cursor.getString(columnIndex)
-      }
-    }
-    cursor?.close()
-    return filePath
-  }
-
-
-  //根据uri获取图片绝对路径
-  private fun getImageUriAbsolutePath(uri: Uri?) :String{
-    var filePath = ""
-    val indexTemp = uri.toString().lastIndexOf("/")
-    val id = uri.toString().substring(indexTemp+1)
-    val projection = arrayOf(MediaStore.Images.Media.DATA)
-    val selection = MediaStore.Images.Media._ID + "=?"
-    val selectionArgs = arrayOf(id)
-    val cursor = this.contentResolver.query(
-        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection,selection
-        ,selectionArgs, null)
-    cursor?.let {
-      val columnIndex = it.getColumnIndex(projection[0])
-      if (it.moveToFirst()) {
-        filePath = cursor.getString(columnIndex)
-      }
-    }
-    cursor?.close()
-    return filePath
-  }
-
   /**
    * 裁剪图片方法实现
    * @param uri
@@ -191,6 +146,15 @@ open class ActWebView : ActBaseWebView() {
     startActivityForResult(intent, REQUEST_CROP_IMAGE)
   }
 
+  //获取文件uri
+  private fun getPathUri(filePath:String):Uri{
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      FileProvider.getUriForFile(this,"$packageName.fileProvider",File(filePath))
+    } else {
+       Uri.fromFile(File(tempPicturePath))
+    }
+  }
+
   override fun onActivityResult(requestCode: Int,resultCode: Int,data: Intent?) {
     super.onActivityResult(requestCode, resultCode, data)
     if (resultCode == Activity.RESULT_OK){
@@ -199,55 +163,159 @@ open class ActWebView : ActBaseWebView() {
           if (ratioX > 0 && ratioY > 0){
             startPhotoZoom(it.data)
           }else{
-            callbackData(getImageUriAbsolutePath(it.data))
+            callbackImageUriData(it.data)
           }
         }
       } else if (requestCode == REQUEST_CAPTURE_IMAGE) {  //相机
         if (ratioX > 0 && ratioY > 0){
-          startPhotoZoom(Uri.fromFile(File(tempPicturePath)))
+          startPhotoZoom(getPathUri(tempPicturePath))
         }else{
-          callbackData(tempPicturePath)
+          callbackImageData(tempPicturePath)
         }
       } else if (requestCode == REQUEST_CROP_IMAGE) { //裁剪
-        callbackData(tempPicturePath)
+        callbackImageData(tempPicturePath)
       } else if (requestCode == REQUEST_PICK_VIDEO){ //视频
         data?.let {
-          callbackData(getVideoUriAbsolutePath(it.data))
+          callbackVideoData(it.data)
         }
       }
     }
   }
 
   /**
-   * 返回数据
+   * 返回图片数据
    */
-  private fun callbackData(filePath:String){
-    val file = File(filePath)
-    val json = JSONObject()
-    json["size"] = file.length()
-    json["name"] = file.name
-    json["path"] = file.absolutePath
-    json["sign"] = UUID.randomUUID().toString()
-    getWebView()?.loadUrl("javascript:$callbackName($json);")
+  private fun callbackImageUriData(uri: Uri?){
+    Thread(Runnable {
+      val imageId = getImageUriId(uri)
+      val filePath = getImageUriAbsolutePath(uri)
+      val file = File(filePath)
+      val json = JSONObject()
+      json["size"] = file.length()
+      json["name"] = file.name
+      json["path"] = file.absolutePath
+      val sign = UUID.randomUUID().toString()
+      json["sign"] = sign
+      json["fileId"] = "${WebConstants.IMAGE_SCHEMT}$imageId/$sign"
+      runOnUiThread {
+        getWebView()?.loadUrl("javascript:$callbackName($json);")
+      }
+    }).start()
   }
 
   /**
-   * 更多按钮被点击了
+   * 返回图片数据
    */
-  override fun moreMenuClick(view: View){
-    val menus = arrayListOf<MenuBean>()
-    menus.add(MenuBean(iconId = R.mipmap.icon_web_safria,menuText = resources.getString(R.string.str_web_open_safria),clickListener = OnClickListener {
-      val viewIntent = Intent(Intent.ACTION_VIEW)
-      viewIntent.data = Uri.parse(intent.getStringExtra(WebConstants.INTENT_URL))
-      startActivity(viewIntent)
-    }))
-    menus.add(MenuBean(iconId = R.mipmap.icon_web_copy_link,menuText = resources.getString(R.string.str_web_copy_safria_url),clickListener = OnClickListener {
-      getJsInterface().addToClipboard(intent.getStringExtra(WebConstants.INTENT_URL))
-    }))
-    menus.add(MenuBean(iconId = R.mipmap.icon_web_share,menuText =resources.getString(R.string.str_web_share),clickListener = OnClickListener {
-      shareDefault()
-    }))
-    PopWindowUtil.showPopWindow(view,menus)
+  private fun callbackImageData(filePath:String){
+    Thread(Runnable {
+      val imageId = getImagePathId(filePath)
+      val file = File(filePath)
+      val json = JSONObject()
+      json["size"] = file.length()
+      json["name"] = file.name
+      json["path"] = file.absolutePath
+      val sign = UUID.randomUUID().toString()
+      json["sign"] = sign
+      json["fileId"] = "${WebConstants.IMAGE_SCHEMT}$imageId/$sign"
+      runOnUiThread {
+        getWebView()?.loadUrl("javascript:$callbackName($json);")
+      }
+    }).start()
+  }
+
+  //获取图片数据库id
+  private fun getImageUriId(uri: Uri?):String{
+    val indexTemp = uri.toString().lastIndexOf("/")
+    return uri.toString().substring(indexTemp+1)
+  }
+
+  //根据uri获取图片绝对路径
+  private fun getImageUriAbsolutePath(uri: Uri?) :String{
+    var filePath = ""
+    val id = getImageUriId(uri)
+    val projection = arrayOf(MediaStore.Images.Media.DATA)
+    val selection = MediaStore.Images.Media._ID + "=?"
+    val selectionArgs = arrayOf(id)
+    val cursor = this.contentResolver.query(
+        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection,selection
+        ,selectionArgs, null)
+    cursor?.let {
+      val columnIndex = it.getColumnIndex(projection[0])
+      if (it.moveToFirst()) {
+        filePath = cursor.getString(columnIndex)
+      }
+    }
+    cursor?.close()
+    return filePath
+  }
+
+  //获取图片id
+  private fun getImagePathId(imagePath:String):String{
+    val contentValues = ContentValues(1)
+    contentValues.put(MediaStore.Images.Media.DATA, imagePath)
+    this.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+    var fileId = ""
+    val projection = arrayOf(MediaStore.Images.Media._ID)
+    val selection = MediaStore.Images.Media.DATA + "=?"
+    val selectionArgs = arrayOf(imagePath)
+    val cursor = this.contentResolver.query(
+        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection,selection
+        ,selectionArgs, null)
+    cursor?.let {
+      val columnIndex = it.getColumnIndex(projection[0])
+      if (it.moveToFirst()) {
+        fileId = cursor.getString(columnIndex)
+      }
+    }
+    cursor?.close()
+    return fileId
+  }
+
+  /**
+   * 返回视频数据
+   */
+  private fun callbackVideoData(uri: Uri?){
+    Thread(Runnable {
+      val videoPath = getVideoUriAbsolutePath(uri)
+      val videoId = getVideoId(uri)
+      val file = File(videoPath)
+      val json = JSONObject()
+      json["size"] = file.length()
+      json["name"] = file.name
+      json["path"] = file.absolutePath
+      val sign = UUID.randomUUID().toString()
+      json["sign"] = sign
+      json["fileId"] = "${WebConstants.VIDEO_SCHEMT}$videoId/$sign"
+      runOnUiThread {
+        getWebView()?.loadUrl("javascript:$callbackName($json);")
+      }
+    }).start()
+  }
+
+  //根据uri获取视频绝对路径
+  private fun getVideoUriAbsolutePath(uri: Uri?) :String{
+    var filePath = ""
+    val id = getVideoId(uri)
+    val projection = arrayOf(MediaStore.Video.Media.DATA)
+    val selection = MediaStore.Video.Media._ID + "=?"
+    val selectionArgs = arrayOf(id)
+    val cursor = this.contentResolver.query(
+        MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projection,selection
+        ,selectionArgs, null)
+    cursor?.let {
+      val columnIndex = it.getColumnIndex(projection[0])
+      if (it.moveToFirst()) {
+        filePath = cursor.getString(columnIndex)
+      }
+    }
+    cursor?.close()
+    return filePath
+  }
+
+  //获取视频id
+  private fun getVideoId(uri: Uri?):String{
+    val indexTemp = uri.toString().lastIndexOf("/")
+    return uri.toString().substring(indexTemp+1)
   }
 
 }

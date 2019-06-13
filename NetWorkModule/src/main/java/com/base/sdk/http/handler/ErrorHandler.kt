@@ -12,6 +12,6 @@ interface ErrorHandler {
    * errorCode:错误码
    * errorMessage：错误信息
    */
-  fun handleError(errorCode:Int,errorMessage:String): Boolean
+  fun handleError(errorCode:Int,errorMessage:Any?): Boolean
 
 }

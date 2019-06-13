@@ -185,6 +185,15 @@ open class ActBaseWeexPage : BasePermissionActivity(){
     startActivityForResult(intent, REQUEST_CROP_IMAGE)
   }
 
+  //获取文件uri
+  private fun getPathUri(filePath:String):Uri{
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      FileProvider.getUriForFile(this,"$packageName.fileProvider",File(filePath))
+    } else {
+      Uri.fromFile(File(tempPicturePath))
+    }
+  }
+
   override fun onActivityResult(requestCode: Int,resultCode: Int,data: Intent?) {
     super.onActivityResult(requestCode, resultCode, data)
     if (resultCode == Activity.RESULT_OK){
@@ -198,7 +207,7 @@ open class ActBaseWeexPage : BasePermissionActivity(){
         }
       } else if (requestCode == REQUEST_CAPTURE_IMAGE) {  //相机
         if (ratioX > 0 && ratioY > 0){
-          startPhotoZoom(Uri.fromFile(File(tempPicturePath)))
+          startPhotoZoom(getPathUri(tempPicturePath))
         }else{
           callbackData(tempPicturePath)
         }

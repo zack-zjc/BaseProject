@@ -23,8 +23,11 @@ open class WXLCStreamModule : WXModule() {
     for ((key,vaule) in options){
       jsonObject[key] = vaule
     }
-    val result = HttpClientUtil.fetch(jsonObject)
+    val result = HttpClientUtil.fetch(parseRequestOption(jsonObject))
     callback.invoke(result)
   }
+
+  //网络请求参数处理
+  open fun parseRequestOption(option:JSONObject) = option
 
 }

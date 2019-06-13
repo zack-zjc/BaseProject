@@ -9,8 +9,9 @@ object WebConstants {
 
   const val INTENT_URL = "url"
   const val PAGE_NAME = "page_name"
-  const val SHOW_MORE = "show_more"
-  const val SHOW_SHARE = "show_share"
+
+  const val IMAGE_SCHEMT = "realimage://"
+  const val VIDEO_SCHEMT = "realvideo://"
 
 
 }

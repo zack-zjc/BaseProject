@@ -26,18 +26,21 @@ open class JScriptInterface(activity: Activity) {
   //主线程
   private val mHandler = Handler(Looper.getMainLooper())
 
+  //网络请求参数处理
+  open fun parseRequestOption(option:JSONObject) = option
+
   //网页请求
   @JavascriptInterface
   open fun proxyRequest(options: String) {
     val jsonObject = JSONObject.parseObject(options)
     val callbackName = if (jsonObject.containsKey("callback")) jsonObject["callback"] else ""
     jsonObject.remove("callback")
+    val requestObject = parseRequestOption(jsonObject)
     try{
-      val result = HttpClientUtil.fetch(JSONObject.parseObject(options))
-      val resultObject = JSONObject.parseObject(result["data"].toString())
+      val result = HttpClientUtil.fetch(requestObject)
       mHandler.post {
         if (activityReference.get() != null && activityReference.get() is ActBaseWebView && !(activityReference.get() as ActBaseWebView).isFinishing){
-          (activityReference.get() as ActBaseWebView).getWebView()?.loadUrl("javascript:$callbackName($resultObject);")
+          (activityReference.get() as ActBaseWebView).getWebView()?.loadUrl("javascript:$callbackName($result);")
         }
       }
     }catch (e:Exception){
@@ -49,16 +52,33 @@ open class JScriptInterface(activity: Activity) {
    * 分享数据设置
    */
   @JavascriptInterface
-  open fun setShareEntity(optionStr: String){
+  open fun setShareEntity(optionStr: String?){
+    val options = JSONObject.parseObject(optionStr)
+    val callbackName = if (options.containsKey("callback")) options["callback"].toString() else ""
+    options.remove("callback")
     mHandler.post {
-      val options = JSONObject.parseObject(optionStr)
-      activityReference.get()?.let {
-        if (it is ActBaseWebView) {
-          val title = options["title"].toString()
-          val desc = options["desc"].toString()
-          val image = options["image"].toString()
-          val html = options["htmlUrl"].toString()
-          it.setShareData(title,desc,image,html)
+      if (!optionStr.isNullOrEmpty()){
+        activityReference.get()?.let {
+          if (it is ActBaseWebView) {
+            if (options.isNotEmpty()){
+              val title = options["title"].toString()
+              val desc = options["desc"].toString()
+              val image = options["image"].toString()
+              val html = options["htmlUrl"].toString()
+              it.setShareData(title,desc,image,html)
+            }else{
+              it.clearShareData()
+            }
+            if (callbackName.isNotEmpty()){
+              it.getWebView()?.loadUrl("javascript:$callbackName();")
+            }
+          }
+        }
+      }else{
+        activityReference.get()?.let {
+          if (it is ActBaseWebView) {
+            it.clearShareData()
+          }
         }
       }
     }
@@ -69,10 +89,16 @@ open class JScriptInterface(activity: Activity) {
    */
   @JavascriptInterface
   open fun shareDefault(optionStr: String){
+    val options = JSONObject.parseObject(optionStr)
+    val callbackName = if (options.containsKey("callback")) options["callback"].toString() else ""
+    options.remove("callback")
     mHandler.post {
       activityReference.get()?.let{
         if (it is ActBaseWebView) {
           it.shareDefault()
+          if (callbackName.isNotEmpty()){
+            it.getWebView()?.loadUrl("javascript:$callbackName();")
+          }
         }
       }
     }
@@ -87,13 +113,14 @@ open class JScriptInterface(activity: Activity) {
    */
   @JavascriptInterface
   open fun pickMedia(optionStr:String){
+    val options = JSONObject.parseObject(optionStr)
+    val callbackName = if (options.containsKey("callback")) options["callback"].toString() else ""
+    options.remove("callback")
     mHandler.post {
       activityReference.get()?.let {
-        val json = JSONObject.parseObject(optionStr)
-        val type = json["type"].toString()
-        val callbackName = if (json.containsKey("callback")) json["callback"].toString() else ""
-        val ratioX = if (json.containsKey("x")) json["x"].toString().toInt() else 0
-        val ratioY = if (json.containsKey("y")) json["y"].toString().toInt() else 0
+        val type = options["type"].toString()
+        val ratioX = if (options.containsKey("x")) options["x"].toString().toInt() else 0
+        val ratioY = if (options.containsKey("y")) options["y"].toString().toInt() else 0
         if (it is ActWebView){
           when(type){
             "0" -> it.takePhoto(ratioX,ratioY,callbackName)
@@ -109,17 +136,32 @@ open class JScriptInterface(activity: Activity) {
    * 添加到剪切板
    */
   @JavascriptInterface
-  fun addToClipboard(message: String) {
-    val clipboardManager = activityReference.get()?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
-    clipboardManager?.text = message
-    Toast.makeText(activityReference.get(), R.string.str_web_copy_sucess,Toast.LENGTH_SHORT).show()
+  fun addToClipboard(optionStr: String) {
+    val options = JSONObject.parseObject(optionStr)
+    val callbackName = if (options.containsKey("callback")) options["callback"].toString() else ""
+    options.remove("callback")
+    mHandler.post {
+      activityReference.get()?.let{
+        val clipboardManager = activityReference.get()?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+        clipboardManager?.text = options["message"].toString()
+        Toast.makeText(it, R.string.str_web_copy_sucess,Toast.LENGTH_SHORT).show()
+        if (it is ActBaseWebView) {
+          if (callbackName.isNotEmpty()){
+            it.getWebView()?.loadUrl("javascript:$callbackName();")
+          }
+        }
+      }
+    }
   }
 
   /**
    * 开启扫码页面
    */
   @JavascriptInterface
-  open fun ScanQrCode(callbackName: String){
+  open fun ScanQrCode(optionStr: String){
+    val options = JSONObject.parseObject(optionStr)
+    val callbackName = if (options.containsKey("callback")) options["callback"].toString() else ""
+    options.remove("callback")
     mHandler.post {
       activityReference.get()?.let{
         if (it is ActBaseWebView) {
@@ -134,8 +176,16 @@ open class JScriptInterface(activity: Activity) {
    */
   @JavascriptInterface
   open fun closePage(optionStr: String){
+    val options = JSONObject.parseObject(optionStr)
+    val callbackName = if (options.containsKey("callback")) options["callback"].toString() else ""
+    options.remove("callback")
     mHandler.post {
-      activityReference.get()?.finish()
+      activityReference.get()?.let{
+        if (it is ActBaseWebView) {
+          it.getWebView()?.loadUrl("javascript:$callbackName();")
+        }
+        it.finish()
+      }
     }
   }
 

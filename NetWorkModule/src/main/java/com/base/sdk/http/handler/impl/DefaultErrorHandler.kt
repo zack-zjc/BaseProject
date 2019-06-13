@@ -17,12 +17,12 @@ open class DefaultErrorHandler : ErrorHandler {
 
   private var mHandler = Handler(Looper.getMainLooper())
 
-   override fun handleError(errorCode:Int,errorMessage:String):Boolean {
+   override fun handleError(errorCode:Int,errorMessage:Any?):Boolean {
     when(errorCode){
       HttpConstants.HTTP_ERROR_UNKNOWN ->{
-        val message = if (errorMessage != "null") errorMessage
+        val message = if (errorMessage.toString() != "null") errorMessage
         else ApplicationContext.CONTEXT.resources.getString(R.string.network_unknown_error)
-        showToast(message)
+        showToast(message.toString())
         return true
       }
       HttpConstants.HTTP_ERROR_NETWORK ->{
@@ -73,11 +73,7 @@ open class DefaultErrorHandler : ErrorHandler {
    * 显示提示
    */
   fun showToast(message:String){
-    mHandler.post(object :Runnable{
-      override fun run() {
-        Toast.makeText(ApplicationContext.CONTEXT,message,Toast.LENGTH_SHORT).show()
-      }
-    })
+    mHandler.post { Toast.makeText(ApplicationContext.CONTEXT,message,Toast.LENGTH_SHORT).show() }
   }
 
 }
