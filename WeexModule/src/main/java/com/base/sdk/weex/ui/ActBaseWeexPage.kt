@@ -15,7 +15,7 @@ import com.base.sdk.base.activity.BasePermissionActivity
 import com.base.sdk.qrcode.ui.ActQrcodeScanner
 import com.taobao.weex.bridge.JSCallback
 import java.io.File
-import java.util.UUID
+import java.util.*
 
 /**
  * author:zack
@@ -55,8 +55,8 @@ open class ActBaseWeexPage : BasePermissionActivity(){
     this.ratioX = ratioX
     this.ratioY = ratioY
     requestCustomPermission(arrayOf(android.Manifest.permission.CAMERA,android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
-        title = "温馨提示",desc = "当前操作需要获取您的[存储]权限存储照片!"){
-      if (it){
+        title = "温馨提示",desc = "当前操作需要获取您的[存储]权限存储照片!"){ gainPermission,forbidForever ->
+      if (gainPermission){
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*" // 设置文件类型
         startActivityForResult(intent, REQUEST_PICK_IMAGE)
@@ -76,8 +76,8 @@ open class ActBaseWeexPage : BasePermissionActivity(){
     this.ratioX = ratioX
     this.ratioY = ratioY
     requestCustomPermission(arrayOf(android.Manifest.permission.CAMERA,android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
-        title = "温馨提示",desc = "当前操作需要获取您的[相机]权限用于拍照和[存储]权限存储照片!"){
-      if (it){
+        title = "温馨提示",desc = "当前操作需要获取您的[相机]权限用于拍照和[存储]权限存储照片!"){ gainPermission,forbidForever ->
+      if (gainPermission){
         captureImage()
       }
     }
@@ -93,7 +93,7 @@ open class ActBaseWeexPage : BasePermissionActivity(){
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
       //临时添加一个拍照权限
       intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-      val contentUri = FileProvider.getUriForFile(this,"$packageName.fileProvider",
+      val contentUri = FileProvider.getUriForFile(this,"$packageName.FileProvider",
           File(tempPicturePath)
       )
       intent.putExtra(MediaStore.EXTRA_OUTPUT, contentUri)
@@ -188,7 +188,7 @@ open class ActBaseWeexPage : BasePermissionActivity(){
   //获取文件uri
   private fun getPathUri(filePath:String):Uri{
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-      FileProvider.getUriForFile(this,"$packageName.fileProvider",File(filePath))
+      FileProvider.getUriForFile(this,"$packageName.FileProvider",File(filePath))
     } else {
       Uri.fromFile(File(tempPicturePath))
     }

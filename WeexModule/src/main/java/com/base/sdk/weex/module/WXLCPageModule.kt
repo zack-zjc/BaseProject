@@ -73,4 +73,18 @@ open class WXLCPageModule : WXModule(){
     }
   }
 
+  /**
+   * 从当前页面打开一个新的页面
+   */
+  @JSMethod(uiThread = true)
+  open fun openUrl(option:Map<String,Any>){
+    val pageUrl = option["url"].toString()
+    val context = mWXSDKInstance.context
+    if (context is ActWeexPage) {
+      context.openUrl(pageUrl)
+    }
+  }
+
+
+
 }

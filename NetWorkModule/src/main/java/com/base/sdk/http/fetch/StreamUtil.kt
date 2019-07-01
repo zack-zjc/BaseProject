@@ -13,6 +13,7 @@ import com.base.sdk.http.httpclient.OkHttpUtil
 import com.base.sdk.http.httpclient.OkHttpUtil.REQUEST_CLIENT
 import okhttp3.Request
 import okhttp3.RequestBody
+import okhttp3.internal.Util
 import org.apache.http.conn.ConnectTimeoutException
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -54,25 +55,26 @@ object StreamUtil {
       var url = host + path
       val urlRequestSuffix = HttpConfig.getRequestUrlSuffix()
       if (!urlRequestSuffix.isNullOrEmpty()){
-        if (url.contains("?") && url.endsWith("?")){
-          url += urlRequestSuffix
+        url += if (url.contains("?") && url.endsWith("?")){
+          urlRequestSuffix
         }else if (url.contains("?")){
-          url += "&$urlRequestSuffix"
+          "&$urlRequestSuffix"
         }else{
-          url += "?$urlRequestSuffix"
+          "?$urlRequestSuffix"
         }
       }
       var queryParamStr = ""
       for ((key,value) in queryParam){
-        queryParamStr += "$key=${URLEncoder.encode(value.toString(), "utf-8")}"
+        queryParamStr += "$key=${URLEncoder.encode(value.toString(), "utf-8")}&"
       }
       if (queryParamStr.isNotEmpty()){
-        if (url.contains("?") && url.endsWith("?")){
-          url += queryParamStr
+        queryParamStr = queryParamStr.substring(0,queryParamStr.length-1)
+        url += if (url.contains("?") && url.endsWith("?")){
+          queryParamStr
         }else if (url.contains("?")){
-          url += "&$queryParamStr"
+          "&$queryParamStr"
         }else{
-          url += "?$queryParamStr"
+          "?$queryParamStr"
         }
       }
       val builder = Request.Builder().url(url)
@@ -120,6 +122,7 @@ object StreamUtil {
         returnData = it.handleResponse(response)
       }
       result["data"] = returnData
+      Util.closeQuietly(response)
       return result
     }catch (e:Exception){
       return parseException(e)

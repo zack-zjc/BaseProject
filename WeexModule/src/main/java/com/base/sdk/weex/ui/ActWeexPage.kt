@@ -186,6 +186,18 @@ open class ActWeexPage : ActBaseWeexPage() ,OnClickListener, IWXRenderListener {
   }
 
   /**
+   * 打开新的页面
+   */
+  open fun openUrl(pageUrl:String){
+    if (pageUrl.isNotEmpty()){
+      mWXSDKInstance?.destroy()
+      mWXSDKInstance = WXSDKInstance(this)
+      mWXSDKInstance?.registerRenderListener(this)
+      initPage(pageUrl,"")
+    }
+  }
+
+  /**
    * 设置界面标题
    */
   open fun setPageTitle(titleStr:String){

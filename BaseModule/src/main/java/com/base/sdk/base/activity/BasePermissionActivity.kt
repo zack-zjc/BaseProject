@@ -1,5 +1,6 @@
 package com.base.sdk.base.activity
 
+import android.content.Context
 import android.content.pm.PackageManager
 import android.support.annotation.NonNull
 import android.support.v4.app.ActivityCompat
@@ -25,7 +26,7 @@ abstract class BasePermissionActivity : BaseActivity() {
 
   override fun onStart() {
     super.onStart()
-    if (firstRequestPermission && !requestedPermission().isEmpty()){
+    if (firstRequestPermission && requestedPermission().isNotEmpty()){
       firstRequestPermission = false
       requestPermissions()
     }
@@ -38,13 +39,15 @@ abstract class BasePermissionActivity : BaseActivity() {
     if (checkAllPermission(requestedPermission())){
       gainPermissionAfterAction()
     }else{
-      PermissionDialogUtil.jumpPermissionExplainDialog(this,permissionExplainTitle(),permissionExplainDesc(),
+      showPermissionExplainDialog(this,permissionExplainTitle(),permissionExplainDesc(),
           this::refusePermissionAction) {
         disposable = rxPermissions.requestEachCombined(*requestedPermission()).subscribe {
-          when{
-            it.granted -> gainPermissionAfterAction()//全部同意后调用
-            it.shouldShowRequestPermissionRationale -> forbidPermissionAfterAction()//只要有一个选择：禁止，但没有选择“以后不再询问”，以后申请权限，会继续弹出提示
-            else -> forbidForeverPermissionAfterAction()//只要有一个选择：禁止，但选择“以后不再询问”，以后申请权限，不会继续弹出提示
+          if (!it.shouldShowRequestPermissionRationale && !it.granted){//只要有一个选择：禁止，但没有选择“以后不再询问”，以后申请权限，会继续弹出提示
+            forbidForeverPermissionAfterAction()
+          }else if (it.granted){//全部同意后调用
+            gainPermissionAfterAction()
+          }else{//只要有一个选择：禁止，但选择“以后不再询问”，以后申请权限，不会继续弹出提示
+            forbidPermissionAfterAction()
           }
         }
       }
@@ -52,9 +55,17 @@ abstract class BasePermissionActivity : BaseActivity() {
   }
 
   /**
+   * 可自定义的权限弹框
+   */
+  protected open fun showPermissionExplainDialog(context: Context,permissionTitle:CharSequence,permissionDesc:CharSequence,
+    refusePermissionAction:()->Unit,confirmPermissionAction:()->Unit){
+    PermissionDialogUtil.jumpPermissionExplainDialog(context,permissionTitle,permissionDesc,refusePermissionAction,confirmPermissionAction)
+  }
+
+  /**
    * 检测是否所有权限都通过了
    */
-  private fun checkAllPermission(@NonNull permissions:Array<String>):Boolean{
+  protected fun checkAllPermission(@NonNull permissions:Array<String>):Boolean{
     var result = true
     if (permissions.isNotEmpty()){
       for (permission in permissions){
@@ -67,17 +78,20 @@ abstract class BasePermissionActivity : BaseActivity() {
 
   /**
    * 请求权限
+   * @param callback d第一个参数为是否授权，第二个参数为是否永久拒绝
    */
-  fun requestCustomPermission(@NonNull permissions:Array<String>,title:CharSequence,desc:CharSequence,callback:(Boolean)->Unit){
+  fun requestCustomPermission(@NonNull permissions:Array<String>,title:CharSequence,desc:CharSequence,callback:(Boolean,Boolean)->Unit){
     if (checkAllPermission(permissions)){
-      callback(true)
+      callback(true,false)
     }else{
-      PermissionDialogUtil.jumpPermissionExplainDialog(this,title,desc,{callback(false)}) {
+      showPermissionExplainDialog(this,title,desc,{callback(false,false)}) {
         customDisposable = rxPermissions.requestEachCombined(*permissions).subscribe {
-          when {
-            it.granted -> callback(true) //全部同意后调用
-            it.shouldShowRequestPermissionRationale -> callback(false) //只要有一个选择：禁止，但没有选择“以后不再询问”，以后申请权限，会继续弹出提示
-            else -> callback(false)//只要有一个选择：禁止，但选择“以后不再询问”，以后申请权限，不会继续弹出提示
+          if (!it.shouldShowRequestPermissionRationale && !it.granted){//只要有一个选择：禁止，但没有选择“以后不再询问”，以后申请权限，会继续弹出提示
+            callback(false,true)
+          }else if (it.granted){//全部同意后调用
+            callback(true,false)
+          }else{//只要有一个选择：禁止，但选择“以后不再询问”，以后申请权限，不会继续弹出提示
+            callback(false,false)
           }
         }
       }
