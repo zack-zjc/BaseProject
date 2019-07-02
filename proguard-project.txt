@@ -41,7 +41,7 @@
 #优化时允许访问并修改类和类的成员的 访问修饰符，可能作用域会变大
 -mergeinterfacesaggressively
 #过度加载，多个属性和方法使用相同的名字，只是参数和返回类型不同 可能各种异常
--overloadaggressively
+#-overloadaggressively
 # For retrolambda
 -dontwarn java.lang.invoke.*
 -keep class org.json.** {*;}
@@ -133,6 +133,9 @@ public static ** valueOf(java.lang.String);
 -keep public class * extends android.view.View
 -keep public class com.android.vending.licensing.ILicensingService
 -keep class android.support.** {*;}
+
+#忽略警告
+-ignorewarnings
 
 #fastjson
 -dontwarn com.alibaba.fastjson.**
@@ -227,3 +230,7 @@ public static ** valueOf(java.lang.String);
     java.lang.Object readResolve();
 }
 #cookie-jar -end
+
+#web混淆
+-keep class com.base.sdk.web.jsinterface.JScriptInterface{ *; }
+
