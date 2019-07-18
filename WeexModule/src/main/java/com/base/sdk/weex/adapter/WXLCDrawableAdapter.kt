@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.taobao.weex.adapter.DrawableStrategy
 import com.taobao.weex.adapter.IDrawableLoader
@@ -32,9 +32,13 @@ open class WXLCDrawableAdapter(context: Context) :IDrawableLoader {
     }
   }
 
-  class DrawableLoadTarget(drawableTarget:IDrawableLoader.DrawableTarget) : SimpleTarget<Drawable>() {
+  class DrawableLoadTarget(drawableTarget:DrawableTarget) : CustomTarget<Drawable>() {
 
-    private val drawableTarget =  WeakReference<IDrawableLoader.DrawableTarget>(drawableTarget)
+    override fun onLoadCleared(placeholder: Drawable?) {
+      drawableTarget.get()?.setDrawable(null,true)
+    }
+
+    private val drawableTarget =  WeakReference<DrawableTarget>(drawableTarget)
 
     override fun onLoadStarted(placeholder: Drawable?) {
       drawableTarget.get()?.setDrawable(placeholder,true)

@@ -1,22 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.base.sdk.weex">
+          package="com.base.sdk">
 
-  <uses-permission android:name="android.permission.INTERNET"/>
-  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
-  <application >
+    <application >
 
-    <activity
-        android:configChanges="orientation|keyboardHidden|screenSize|smallestScreenSize|screenLayout"
-        android:name="com.base.sdk.weex.ui.ActWeexPage"
-        android:screenOrientation="portrait"
-        android:exported="false"
-        android:theme="@style/NewAppTheme.Weex.WhiteStatusBar"
-        android:windowSoftInputMode="stateHidden|adjustNothing"/>
+        <activity
+                android:configChanges="orientation|keyboardHidden|screenSize|smallestScreenSize|screenLayout"
+                android:name=".weex.ui.ActWeexPage"
+                android:screenOrientation="portrait"
+                android:exported="false"
+                android:theme="@style/NewAppTheme.Weex.WhiteStatusBar"
+                android:windowSoftInputMode="stateHidden|adjustNothing"/>
 
-  </application>
+    </application>
 
 </manifest>

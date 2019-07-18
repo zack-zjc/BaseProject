@@ -1,6 +1,11 @@
 package com.base.sdk.weex
 
 import android.app.Application
+import com.base.sdk.weex.adapter.WXLCDrawableAdapter
+import com.base.sdk.weex.adapter.WXLCImageAdapter
+import com.base.sdk.weex.adapter.WXLCJSExceptionAdapter
+import com.base.sdk.weex.module.WXLCPageModule
+import com.base.sdk.weex.module.WXLCStreamModule
 import com.taobao.weex.InitConfig
 import com.taobao.weex.WXSDKEngine
 
@@ -16,18 +21,17 @@ object WeexLib {
    * application:context
    * weexInterface:对应注册的模块
    */
-  fun init(application: Application,configBuilder:InitConfig.Builder,weexInterface:WeexInterface=DefaultWeexInterface()){
+  fun init(application: Application){
     //注册加载模块
-    configBuilder.setImgAdapter(weexInterface.getImageAdapter())
-    configBuilder.setDrawableLoader(weexInterface.getDrawableAdapter(application))
-    configBuilder.setJSExceptionAdapter(weexInterface.getExceptionAdapter())
-    configBuilder.setHttpAdapter(weexInterface.getHttpAdapter())
+    val configBuilder = InitConfig.Builder()
+    configBuilder.setImgAdapter(WXLCImageAdapter())
+    configBuilder.setDrawableLoader(WXLCDrawableAdapter(application))
+    configBuilder.setJSExceptionAdapter(WXLCJSExceptionAdapter())
     WXSDKEngine.initialize(application,configBuilder.build())
 
     //注册模块
-    WXSDKEngine.registerModule(weexInterface.getWxStreamModuleName(), weexInterface.getWxStreamModule())
-    WXSDKEngine.registerModule(weexInterface.getWxEventModuleName(), weexInterface.getWxEventModule())
-    WXSDKEngine.registerModule(weexInterface.getWxPageModuleName(), weexInterface.getWxPageModule())
+    WXSDKEngine.registerModule("wx_stream", WXLCStreamModule::class.java)
+    WXSDKEngine.registerModule("wx_page", WXLCPageModule::class.java)
 
   }
 

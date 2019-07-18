@@ -6,11 +6,10 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.widget.ImageView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
+import com.bumptech.glide.load.resource.gif.GifDrawable
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.taobao.weex.adapter.IWXImgLoaderAdapter
 import com.taobao.weex.common.WXImageStrategy
 import com.taobao.weex.dom.WXImageQuality
@@ -20,6 +19,7 @@ import java.io.File
  * author:zack
  * Date:2019/3/27
  * Description:图片加载类
+ * Tips:onImageFinish回调获取图片的宽高返回需要在imageview设置过图片资源获取
  */
 open class WXLCImageAdapter : IWXImgLoaderAdapter{
 
@@ -35,33 +35,37 @@ open class WXLCImageAdapter : IWXImgLoaderAdapter{
       }
       val context = it.context
       if (context is Activity && !context.isDestroyed && !context.isFinishing){
-        Glide.with(context).asDrawable().load(imageUri).diskCacheStrategy(DiskCacheStrategy.ALL).listener(object :
-            RequestListener<Drawable> {
+        Glide.with(context).asDrawable().load(imageUri).diskCacheStrategy(DiskCacheStrategy.ALL).into(object : CustomTarget<Drawable>(){
 
-          override fun onResourceReady(resource: Drawable?,model: Any?,target: Target<Drawable>?,
-            dataSource: DataSource?,isFirstResource: Boolean): Boolean {
+          override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
             try {
+              it.setImageDrawable(resource)
               if (strategy != null && strategy.imageListener != null) {
                 val extra = mutableMapOf<String,Int>()
                 if (resource is BitmapDrawable){
                   extra["naturalWidth"] = resource.bitmap.width
                   extra["naturalHeight"] = resource.bitmap.height
+                }else if (resource is GifDrawable){
+                  extra["naturalWidth"] = resource.intrinsicWidth
+                  extra["naturalHeight"] = resource.intrinsicHeight
+                  resource.start()
                 }
-                strategy.imageListener.onImageFinish(url, view, true, extra)
+                strategy.imageListener.onImageFinish(url, it, true, extra)
               }
             } catch (e: Exception) {
               e.printStackTrace()
             }
-            return false
           }
 
-          override fun onLoadFailed(e: GlideException?,model: Any?,target: Target<Drawable>?,
-            isFirstResource: Boolean): Boolean {
-            e?.printStackTrace()
-            it.setImageDrawable(null)
-            return false
+          override fun onLoadCleared(placeholder: Drawable?) {
+            it.setImageDrawable(placeholder)
           }
-        }).into(it)
+
+          override fun onLoadFailed(errorDrawable: Drawable?) {
+            it.setImageDrawable(null)
+          }
+
+        })
       }
     }
   }

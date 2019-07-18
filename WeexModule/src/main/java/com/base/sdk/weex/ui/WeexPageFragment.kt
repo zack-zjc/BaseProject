@@ -3,17 +3,17 @@ package com.base.sdk.weex.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import com.base.sdk.weex.R
-import com.base.sdk.weex.constants.WeexConstant
+import com.base.sdk.R
+import com.base.sdk.weex.WeexConstant
 import com.taobao.weex.IWXRenderListener
 import com.taobao.weex.WXSDKInstance
 import com.taobao.weex.common.WXRenderStrategy
-import me.yokeyword.fragmentation_swipeback.SwipeBackFragment
 import java.io.File
 
 /**
@@ -21,18 +21,13 @@ import java.io.File
  * Date:2019/3/27
  * Description:展示weex的fragment
  */
-open class WeexPageFragment : SwipeBackFragment() , IWXRenderListener {
+open class WeexPageFragment : Fragment(), IWXRenderListener {
 
   //instance对象
-  protected var mWXSDKInstance: WXSDKInstance? = null
+  private var mWXSDKInstance: WXSDKInstance? = null
 
   //默认展示weex页面的layout
-  protected var container: FrameLayout? = null
-
-  /**
-   * 是否lazyInit初始化界面
-   */
-  protected open fun lazyInitView() = true
+  private var container: FrameLayout? = null
 
   /**
    * weex地址
@@ -52,20 +47,8 @@ open class WeexPageFragment : SwipeBackFragment() , IWXRenderListener {
     this.container = view.findViewById(R.id.id_weex_page_container)
     mWXSDKInstance = WXSDKInstance(context)
     mWXSDKInstance?.registerRenderListener(this)
-    if (!lazyInitView()){
-      initPage()
-    }
+    initPage()
     return view
-  }
-
-  /**
-   * lazyInit
-   */
-  override fun onLazyInitView(savedInstanceState: Bundle?) {
-    super.onLazyInitView(savedInstanceState)
-    if (lazyInitView()){
-      initPage()
-    }
   }
 
   /**
@@ -98,7 +81,7 @@ open class WeexPageFragment : SwipeBackFragment() , IWXRenderListener {
    * 加载界面失败
    */
   override fun onException(instance: WXSDKInstance?,errCode: String?,msg: String?) {
-    Log.e("ActWeexPage",msg.toString())
+    Log.e("weex",msg.toString())
   }
 
   /**
@@ -165,16 +148,6 @@ open class WeexPageFragment : SwipeBackFragment() , IWXRenderListener {
   override fun onDestroyView() {
     super.onDestroyView()
     mWXSDKInstance?.onActivityDestroy()
-  }
-
-  /**
-   * 生命周期处理
-   */
-  override fun onBackPressedSupport(): Boolean {
-    if (mWXSDKInstance?.onActivityBack() != true) {
-      return super.onBackPressedSupport()
-    }
-    return true
   }
 
   /**

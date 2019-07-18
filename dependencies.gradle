@@ -1,47 +1,20 @@
 project.ext {
 
-    Properties properties = new Properties()
-    properties.load(file('./build.properties').newDataInputStream())
-
-    def flag = properties.getProperty("debug").toBoolean()
-
     android = [
             compileSdkVersion: 28,
-            buildToolsVersion: "27.0.3",
+            buildToolsVersion: "28.0.2",
             minSdkVersion    : 21,
-            targetSdkVersion : 23,
-            IS_DEBUG         : flag
+            targetSdkVersion : 28,
     ]
 
     dependencies = [
-            "multidex"                      : 'com.android.support:multidex:1.0.2',
             "kotlin-stdlib-jdk7"            : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version",
-            "constraintlayout"              : "com.android.support.constraint:constraint-layout:1.1.2",
-            "weex_sdk"                      : "com.taobao.android:weex_sdk:0.20.3.0-beta@aar",
             "fastjson"                      : "com.alibaba:fastjson:1.1.46.android",
-            "recyclerview-v7"               : "com.android.support:recyclerview-v7:27.1.1",
+            "okhttp"                        : "com.squareup.okhttp3:okhttp:3.13.1",
+            "weex_sdk"                      : "com.taobao.android:weex_sdk:0.20.3.0-beta@aar",
             "appcompat-v7"                  : "com.android.support:appcompat-v7:27.1.1",
-            "support-v4"                    : "com.android.support:support-v4:27.1.1",
-            "design"                        : 'com.android.support:design:27.1.1',
             "glide"                         : "com.github.bumptech.glide:glide:4.9.0",
             "glide-compiler"                : "com.github.bumptech.glide:compiler:4.9.0",
-            "glide-transformations"         : 'jp.wasabeef:glide-transformations:3.3.0',
-            "okhttp"                        : "com.squareup.okhttp3:okhttp:3.13.1",
-            "logging-interceptor"           : 'com.squareup.okhttp3:logging-interceptor:3.4.2',
-            "fragmentation"                 : "me.yokeyword:fragmentation:1.3.6",
-            "fragmentation-swipeback"       : "me.yokeyword:fragmentation-swipeback:1.3.6",
-            "rxpermissions"                 : "com.github.tbruyelle:rxpermissions:0.10.2",
-            "zxing-library"                 : "cn.yipianfengye.android:zxing-library:2.2",
-            "wechat-sdk"                    : "com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+",
-            "weibo-sdk"                     : "com.sina.weibo.sdk:core:4.3.6:openDefaultRelease@aar",
-            "agentweb"                      : "com.just.agentweb:agentweb:4.0.2",
-            "agentweb-download"             : "com.just.agentweb:download:4.0.2",
-            "agentweb-filechooser"          : "com.just.agentweb:filechooser:4.0.2",
-            "PersistentCookieJar"           : "com.github.franmontiel:PersistentCookieJar:v1.0.1",
-            "CBDialog"                      : "com.github.yilylong:CBDialog:v1.0.7",
-            "uemng-analytics"               : "com.umeng.umsdk:analytics:8.0.0",
-            "uemng-common"                  : "com.umeng.umsdk:common:2.0.0",
-            "WheelPicker"                   : "com.github.gzu-liyujiang.AndroidPicker:WheelPicker:latest.release",
     ]
 
 }

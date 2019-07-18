@@ -1,4 +1,0 @@
-<resources>
-  <string name="app_name">QrcodeModule</string>
-  <string name="str_qrcode_permission_scanner_hint">为了正常扫码,需要获取您的扫码权限!</string>
-</resources>

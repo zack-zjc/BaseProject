@@ -3,6 +3,7 @@ package com.base.sdk.weex.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.view.View.OnClickListener
@@ -10,8 +11,8 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import com.base.sdk.weex.R
-import com.base.sdk.weex.constants.WeexConstant
+import com.base.sdk.R
+import com.base.sdk.weex.WeexConstant
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.taobao.weex.IWXRenderListener
@@ -20,34 +21,34 @@ import com.taobao.weex.bridge.JSCallback
 import com.taobao.weex.common.WXRenderStrategy
 import java.io.File
 
-open class ActWeexPage : ActBaseWeexPage() ,OnClickListener, IWXRenderListener {
+open class ActWeexPage : AppCompatActivity(),OnClickListener, IWXRenderListener {
 
   //默认展示weex页面的layout
-  protected var container:FrameLayout? = null
+  private var container:FrameLayout? = null
 
   //返回按钮
-  protected var backIcon:ImageView? = null
+  private var backIcon:ImageView? = null
 
   //页面标题
-  protected var title:TextView? = null
+  private var title:TextView? = null
 
   //菜单的文字
-  protected var menuText:TextView? = null
+  private var menuText:TextView? = null
 
   //自定义菜单图标
-  protected var menuCustomIcon:ImageView? = null
+  private var menuCustomIcon:ImageView? = null
 
   //自定义的导航栏
-  protected var toolBar:View? = null
+  private var toolBar:View? = null
 
   //menu文字的callback
-  protected var menuTextCallback:JSCallback? = null
+  private var menuTextCallback:JSCallback? = null
 
   //menu图标的callback
-  protected var menuIconCustomCallback:JSCallback? = null
+  private var menuIconCustomCallback:JSCallback? = null
 
   //instance对象
-  protected var mWXSDKInstance: WXSDKInstance? = null
+  private var mWXSDKInstance: WXSDKInstance? = null
 
   //是否渲染成功
   private var renderSucess = false
@@ -56,7 +57,7 @@ open class ActWeexPage : ActBaseWeexPage() ,OnClickListener, IWXRenderListener {
    * 根布局的resId
    * 默认-1为使用默认根布局
    */
-  protected fun getLayoutId() = R.layout.layout_weex_main_page
+  open fun getLayoutId() = R.layout.layout_weex_main_page
 
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -110,7 +111,7 @@ open class ActWeexPage : ActBaseWeexPage() ,OnClickListener, IWXRenderListener {
    * 加载界面失败
    */
   override fun onException(instance: WXSDKInstance?,errCode: String?,msg: String?) {
-    Log.e("ActWeexPage",msg.toString())
+    Log.e("weex",msg.toString())
   }
 
   /**
@@ -124,9 +125,9 @@ open class ActWeexPage : ActBaseWeexPage() ,OnClickListener, IWXRenderListener {
   /**
    * 界面返回处理
    */
-  override fun onBackPressedSupport() {
+  override fun onBackPressed() {
     if (mWXSDKInstance?.onActivityBack() == false) {
-      super.onBackPressedSupport()
+      super.onBackPressed()
     }
   }
 
@@ -164,7 +165,7 @@ open class ActWeexPage : ActBaseWeexPage() ,OnClickListener, IWXRenderListener {
    * isDarkStatus是否使用深色的bar,true使用白色图标，false:黑色图标
    */
   open fun setStatusTheme(statusBarColor:Int,isDarkStatus:Boolean){
-    initStatusBarColor(statusBarColor)
+    window.statusBarColor = statusBarColor
     toolBar?.setBackgroundColor(statusBarColor)
     setPageStyle(isDarkStatus)
   }
@@ -183,18 +184,6 @@ open class ActWeexPage : ActBaseWeexPage() ,OnClickListener, IWXRenderListener {
         R.color.color_weex_menu_white_color
     )
     else resources.getColor(R.color.color_weex_menu_color))
-  }
-
-  /**
-   * 打开新的页面
-   */
-  open fun openUrl(pageUrl:String){
-    if (pageUrl.isNotEmpty()){
-      mWXSDKInstance?.destroy()
-      mWXSDKInstance = WXSDKInstance(this)
-      mWXSDKInstance?.registerRenderListener(this)
-      initPage(pageUrl,"")
-    }
   }
 
   /**
@@ -235,7 +224,7 @@ open class ActWeexPage : ActBaseWeexPage() ,OnClickListener, IWXRenderListener {
     view?.let {
       when(it.id){
         backIcon?.id ->{
-          onBackPressedSupport()
+          onBackPressed()
         }
         menuText?.id ->{
           menuTextCallback?.invokeAndKeepAlive(0)

@@ -1,7 +1,7 @@
 package com.base.sdk.weex.module
 
 import com.alibaba.fastjson.JSONObject
-import com.base.sdk.http.fetch.HttpClientUtil
+import com.base.sdk.http.HttpClientUtil
 import com.taobao.weex.annotation.JSMethod
 import com.taobao.weex.bridge.JSCallback
 import com.taobao.weex.common.WXModule
@@ -20,14 +20,11 @@ open class WXLCStreamModule : WXModule() {
   @JSMethod(uiThread = false)
   open fun fetch(options: Map<String, Any>,callback: JSCallback) {
     val jsonObject = JSONObject()
-    for ((key,vaule) in options){
-      jsonObject[key] = vaule
+    for ((key,value) in options){
+      jsonObject[key] = value
     }
-    val result = HttpClientUtil.fetch(parseRequestOption(jsonObject))
+    val result = HttpClientUtil.fetch(jsonObject)
     callback.invoke(result)
   }
-
-  //网络请求参数处理
-  open fun parseRequestOption(option:JSONObject) = option
 
 }

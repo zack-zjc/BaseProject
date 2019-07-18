@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-  <item name="id_share_recycler_view" type="id" />
-  <item name="id_share_image_view" type="id" />
-  <item name="id_share_text_view" type="id" />
-
-</resources>
